@@ -34,7 +34,6 @@
       }
       button:hover { background-color: #1ebe5b; }
 
-      /* Tela de carregamento */
       .overlay {
         display: none;
         position: fixed;
@@ -86,7 +85,6 @@
 
     <button onclick="confirmarPresenca()">Confirmar Presença</button>
 
-    <!-- Tela de carregamento -->
     <div class="overlay" id="overlay">
       <div class="spinner"></div>
     </div>
@@ -131,7 +129,6 @@
           return;
         }
 
-        // Mostra o carregando
         document.getElementById("overlay").style.display = "flex";
 
         fetch("https://confirmacao.danielfelipe-engcivil.workers.dev/", {
@@ -144,19 +141,19 @@
           headers: { "Content-Type": "application/json" }
         }).then(response => response.json())
           .then(data => {
-            document.getElementById("overlay").style.display = "none"; // esconde o loading
+            document.getElementById("overlay").style.display = "none";
             if (data.status === "success") {
-              let mensagem = `✅ *Confirmação de Presença*%0A%0A👤 *Convidado:* ${nome}`;
+              let mensagem = `✨ Confirmação de Presença ✨%0A%0A🎉 Convidado: ${nome}`;
               if (acompanhantes.length > 0) {
-                mensagem += `%0A👥 *Acompanhantes:*%0A`;
+                mensagem += `%0A👫 Acompanhante(s):%0A`;
                 acompanhantes.forEach(acomp => {
                   mensagem += `• ${acomp}%0A`;
                 });
               }
-              mensagem += `%0A💒 Mal posso esperar por esse momento especial com vocês! ✨`;
+              mensagem += `%0A%0ACom muita alegria, confirmamos nossa presença nesse momento tão especial.%0AEstamos contando os dias para celebrar com vocês! 💖`;
 
               const numero = "556392255000";
-              const url = `https://wa.me/${numero}?text=${mensagem}`;
+              const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
               window.open(url, '_blank');
             } else {
               alert("Houve um erro ao confirmar presença. Tente novamente.");
