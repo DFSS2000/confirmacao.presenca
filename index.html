@@ -128,14 +128,14 @@
 
         document.getElementById("overlay").style.display = "flex";
 
-        fetch("https://script.google.com/macros/s/AKfycbyY2SPXOf9hsvxxs_MHCbwVqtTauVNFAC-qR3GEOMY6A6J4x23TRUIV5Pjn43MceomY4g/exec", {
+        fetch("https://confirmacao.danielfelipe-engcivil.workers.dev/", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             nomePrincipal: nome,
             nomesAcompanhantes: acompanhantes,
             quantidade: qtd
-          }),
-          headers: { "Content-Type": "application/json" }
+          })
         }).then(response => response.json())
           .then(data => {
             document.getElementById("overlay").style.display = "none";
@@ -149,7 +149,7 @@
               }
               mensagem += `\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖`;
 
-              const numero = "556392255000"; // Seu número com DDI e DDD
+              const numero = "556392255000"; // Altere aqui se quiser outro número
               const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
               window.open(url, '_blank');
             } else {
