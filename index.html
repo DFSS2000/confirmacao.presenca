@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #fafafa;
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      }
+      h2 { text-align: center; color: #333; }
+      label { display: block; margin-top: 15px; }
+      input, select, button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+      .acompanhantes { margin-top: 15px; }
+      button {
+        background-color: #25d366;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+      button:hover { background-color: #1ebe5b; }
+    </style>
+  </head>
+  <body>
+    <h2>Confirmação de Presença</h2>
+
+    <label for="nome">Seu nome completo:</label>
+    <input type="text" id="nome" placeholder="Ex: João da Silva" required>
+
+    <label for="qtd">Quantos acompanhantes?</label>
+    <select id="qtd" onchange="gerarCampos()">
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+
+    <div id="camposAcompanhantes" class="acompanhantes"></div>
+
+    <button onclick="confirmarPresenca()">Confirmar Presença</button>
+
+    <script>
+      function gerarCampos() {
+        const qtd = document.getElementById('qtd').value;
+        const container = document.getElementById('camposAcompanhantes');
+        container.innerHTML = '';
+        for (let i = 1; i <= qtd; i++) {
+          const input = document.createElement('input');
+          input.placeholder = `Nome do acompanhante ${i}`;
+          input.id = `acomp${i}`;
+          container.appendChild(input);
+        }
+      }
+
+      function confirmarPresenca() {
+        const nome = document.getElementById('nome').value.trim();
+        if (!nome) {
+          alert("Por favor, preencha seu nome.");
+          return;
+        }
+        const qtd = parseInt(document.getElementById('qtd').value);
+        let acompanhantes = [];
+
+        for (let i = 1; i <= qtd; i++) {
+          const nomeAcomp = document.getElementById(`acomp${i}`).value.trim();
+          if (nomeAcomp) acompanhantes.push(nomeAcomp);
+        }
+
+        fetch("https://script.google.com/macros/s/AKfycbyrbHYhr0XJnDmyfdLxJ4KBLljiS1c4sXd4XcqDFDsSohUEa7Mv6Pqrz-NPH8OXX9BQxw/exec", {
+          method: "POST",
+          body: JSON.stringify({
+            nomePrincipal: nome,
+            nomesAcompanhantes: acompanhantes,
+            quantidade: qtd
+          }),
+          headers: { "Content-Type": "application/json" }
+        }).then(response => response.json())
+        .then(data => {
+          if(data.status === "success") {
+            let mensagem = `Olá! Sou ${nome} e confirmo minha presença no casamento.`;
+            if (acompanhantes.length > 0) {
+              mensagem += `%0AEstou levando os seguintes acompanhantes:%0A`;
+              acompanhantes.forEach(acomp => {
+                mensagem += `- ${acomp}%0A`;
+              });
+            }
+            mensagem += `%0ASerá uma alegria participar desse momento especial! 💍✨`;
+            const numero = "556392255000";
+            const url = `https://wa.me/${numero}?text=${mensagem}`;
+            window.open(url, '_blank');
+          } else {
+            alert("Houve um erro ao confirmar presença. Tente novamente.");
+            console.error(data.message);
+          }
+        }).catch((error) => {
+          alert("Erro ao enviar confirmação. Tente novamente.");
+          console.error(error);
+        });
+      }
+    </script>
+  </body>
+</html>
