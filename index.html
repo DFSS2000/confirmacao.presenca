@@ -50,6 +50,10 @@
       box-shadow: 0 0 5px #25d366a0;
     }
 
+    .acompanhantes input {
+      margin-top: 10px;
+    }
+
     button {
       width: 100%;
       padding: 16px 0;
@@ -70,7 +74,6 @@
       background-color: #1ebe5b;
     }
 
-    /* Loader */
     .loader {
       display: none;
       margin: 25px auto 10px;
@@ -86,11 +89,6 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
-    .hidden {
-      display: none;
-    }
-
   </style>
 </head>
 <body>
@@ -100,7 +98,7 @@
   <input type="text" id="nome" placeholder="Ex: João da Silva" required />
 
   <label for="qtd">Quantos acompanhantes?</label>
-  <select id="qtd">
+  <select id="qtd" onchange="gerarCampos()">
     <option value="0">0</option>
     <option value="1">1</option>
     <option value="2">2</option>
@@ -114,11 +112,28 @@
     <option value="10">10</option>
   </select>
 
+  <div id="camposAcompanhantes" class="acompanhantes"></div>
+
   <button onclick="confirmarPresenca()">Confirmar Presença</button>
 
   <div id="loader" class="loader"></div>
 
   <script>
+    function gerarCampos() {
+      const qtd = parseInt(document.getElementById("qtd").value);
+      const container = document.getElementById("camposAcompanhantes");
+      container.innerHTML = "";
+
+      for (let i = 1; i <= qtd; i++) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = `Nome do acompanhante ${i}`;
+        input.id = `acomp${i}`;
+        input.required = true;
+        container.appendChild(input);
+      }
+    }
+
     async function confirmarPresenca() {
       const nome = document.getElementById("nome").value.trim();
       const qtd = parseInt(document.getElementById("qtd").value);
@@ -131,6 +146,24 @@
         return;
       }
 
+      let acompanhantes = [];
+      let camposVazios = false;
+
+      for (let i = 1; i <= qtd; i++) {
+        const campo = document.getElementById(`acomp${i}`);
+        const nomeAcomp = campo ? campo.value.trim() : "";
+        if (!nomeAcomp) {
+          camposVazios = true;
+        } else {
+          acompanhantes.push(nomeAcomp);
+        }
+      }
+
+      if (qtd > 0 && camposVazios) {
+        alert("Por favor, preencha o nome de todos os acompanhantes.");
+        return;
+      }
+
       const dados = {
         nomePrincipal: nome,
         quantidade: qtd,
@@ -138,7 +171,7 @@
         total: total
       };
 
-      loader.style.display = "block"; // Mostrar carregando
+      loader.style.display = "block";
 
       try {
         const resposta = await fetch("https://confirmacao.danielfelipe-engcivil.workers.dev/", {
@@ -147,27 +180,38 @@
           body: JSON.stringify(dados)
         });
 
-        loader.style.display = "none"; // Ocultar carregando
+        loader.style.display = "none";
 
         if (resposta.ok) {
           alert("Confirmação registrada com sucesso!");
 
           let mensagem = `🎉 *Confirmação de Presença* 🎉\n\n👤 *Convidado:* ${nome}`;
-          if (qtd > 0) {
-            mensagem += `\n👥 *Acompanhantes:* ${qtd}`;
-          }
-          mensagem += `\n\nTotal de pessoas: ${total}`;
-          mensagem += "\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖";
 
-          const numero = "556392255000"; // Altere aqui
+          if (acompanhantes.length === 1) {
+            mensagem += `\n\n👥 *Acompanhante:*`;
+            mensagem += `\n- ${acompanhantes[0]}`;
+          } else if (acompanhantes.length > 1) {
+            mensagem += `\n\n👥 *Acompanhantes:*`;
+            acompanhantes.forEach((acomp) => {
+              mensagem += `\n- ${acomp}`;
+            });
+          }
+
+          if (total === 1) {
+            mensagem += "\n\nCom muita alegria, confirmo minha presença nesse momento tão especial.\nEstamos contando os dias para celebrar com você! 💖";
+          } else {
+            mensagem += "\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖";
+          }
+
+          const numero = "556392255000"; // Troque pelo seu número
           const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
           window.open(url, "_blank");
         } else {
-          alert("Erro ao registrar confirmação. Tente novamente.");
+          alert("Erro ao registrar confirmação.");
         }
       } catch (e) {
         loader.style.display = "none";
-        alert("Erro de conexão com o servidor.");
+        alert("Erro ao conectar com o servidor.");
         console.error(e);
       }
     }
