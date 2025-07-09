@@ -80,7 +80,7 @@
           if (nomeAcomp) acompanhantes.push(nomeAcomp);
         }
 
-        fetch("https://script.google.com/macros/s/AKfycbyrbHYhr0XJnDmyfdLxJ4KBLljiS1c4sXd4XcqDFDsSohUEa7Mv6Pqrz-NPH8OXX9BQxw/exec", {
+        fetch("https://confirmacao.danielfelipe-engcivil.workers.dev/", {
           method: "POST",
           body: JSON.stringify({
             nomePrincipal: nome,
@@ -89,27 +89,27 @@
           }),
           headers: { "Content-Type": "application/json" }
         }).then(response => response.json())
-        .then(data => {
-          if(data.status === "success") {
-            let mensagem = `Olá! Sou ${nome} e confirmo minha presença no casamento.`;
-            if (acompanhantes.length > 0) {
-              mensagem += `%0AEstou levando os seguintes acompanhantes:%0A`;
-              acompanhantes.forEach(acomp => {
-                mensagem += `- ${acomp}%0A`;
-              });
+          .then(data => {
+            if(data.status === "success") {
+              let mensagem = `Olá! Sou ${nome} e confirmo minha presença no casamento.`;
+              if (acompanhantes.length > 0) {
+                mensagem += `%0AEstou levando os seguintes acompanhantes:%0A`;
+                acompanhantes.forEach(acomp => {
+                  mensagem += `- ${acomp}%0A`;
+                });
+              }
+              mensagem += `%0ASerá uma alegria participar desse momento especial! 💍✨`;
+              const numero = "556392255000";
+              const url = `https://wa.me/${numero}?text=${mensagem}`;
+              window.open(url, '_blank');
+            } else {
+              alert("Houve um erro ao confirmar presença. Tente novamente.");
+              console.error(data.message);
             }
-            mensagem += `%0ASerá uma alegria participar desse momento especial! 💍✨`;
-            const numero = "556392255000";
-            const url = `https://wa.me/${numero}?text=${mensagem}`;
-            window.open(url, '_blank');
-          } else {
-            alert("Houve um erro ao confirmar presença. Tente novamente.");
-            console.error(data.message);
-          }
-        }).catch((error) => {
-          alert("Erro ao enviar confirmação. Tente novamente.");
-          console.error(error);
-        });
+          }).catch((error) => {
+            alert("Erro ao enviar confirmação. Tente novamente.");
+            console.error(error);
+          });
       }
     </script>
   </body>
