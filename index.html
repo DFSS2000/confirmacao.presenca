@@ -1,135 +1,159 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Confirmação de Presença</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #fafafa;
-        max-width: 500px;
-        margin: 40px auto;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      }
-      h2 {
-        text-align: center;
-        color: #333;
-      }
-      label {
-        display: block;
-        margin-top: 15px;
-      }
-      input,
-      select,
-      button {
-        width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        font-size: 16px;
-      }
-      .acompanhantes {
-        margin-top: 15px;
-      }
-      button {
-        background-color: #25d366;
-        color: white;
-        border: none;
-        cursor: pointer;
-        margin-top: 20px;
-      }
-      button:hover {
-        background-color: #1ebe5b;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Confirmação de Presença</h2>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confirmação de Presença</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      margin: 20px auto;
+      padding: 15px;
+      max-width: 480px;
+      width: 95vw;
+      border-radius: 12px;
+      box-sizing: border-box;
+      color: #333;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    label {
+      display: block;
+      margin-top: 18px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    input,
+    select {
+      width: 100%;
+      padding: 14px 12px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1.5px solid #ccc;
+      font-size: 1.15rem;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+    input:focus,
+    select:focus {
+      border-color: #25d366;
+      outline: none;
+      box-shadow: 0 0 5px #25d366a0;
+    }
+    .acompanhantes {
+      margin-top: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 16px 0;
+      margin-top: 30px;
+      background-color: #25d366;
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    button:hover,
+    button:focus {
+      background-color: #1ebe5b;
+    }
+    /* Para inputs de acompanhantes */
+    #camposAcompanhantes input {
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Confirmação de Presença</h2>
 
-    <label for="nome">Seu nome completo:</label>
-    <input type="text" id="nome" placeholder="Ex: João da Silva" required />
+  <label for="nome">Seu nome completo:</label>
+  <input type="text" id="nome" placeholder="Ex: João da Silva" required />
 
-    <label for="qtd">Quantos acompanhantes?</label>
-    <select id="qtd" onchange="gerarCampos()">
-      <option value="0">0</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-    </select>
+  <label for="qtd">Quantos acompanhantes?</label>
+  <select id="qtd" onchange="gerarCampos()">
+    <option value="0">0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+  </select>
 
-    <div id="camposAcompanhantes" class="acompanhantes"></div>
+  <div id="camposAcompanhantes" class="acompanhantes"></div>
 
-    <button onclick="confirmarPresenca()">Confirmar Presença</button>
+  <button onclick="confirmarPresenca()">Confirmar Presença</button>
 
-    <script>
-      function gerarCampos() {
-        const qtd = document.getElementById("qtd").value;
-        const container = document.getElementById("camposAcompanhantes");
-        container.innerHTML = "";
-        for (let i = 1; i <= qtd; i++) {
-          const input = document.createElement("input");
-          input.placeholder = `Nome do acompanhante ${i}`;
-          input.id = `acomp${i}`;
-          input.required = true;
-          container.appendChild(input);
+  <script>
+    function gerarCampos() {
+      const qtd = document.getElementById("qtd").value;
+      const container = document.getElementById("camposAcompanhantes");
+      container.innerHTML = "";
+      for (let i = 1; i <= qtd; i++) {
+        const input = document.createElement("input");
+        input.placeholder = `Nome do acompanhante ${i}`;
+        input.id = `acomp${i}`;
+        input.required = true;
+        container.appendChild(input);
+      }
+    }
+
+    function confirmarPresenca() {
+      const nome = document.getElementById("nome").value.trim();
+      if (!nome) {
+        alert("Por favor, preencha seu nome.");
+        return;
+      }
+
+      const qtd = parseInt(document.getElementById("qtd").value);
+      let acompanhantes = [];
+      let camposVazios = false;
+
+      for (let i = 1; i <= qtd; i++) {
+        const campo = document.getElementById(`acomp${i}`);
+        const nomeAcomp = campo ? campo.value.trim() : "";
+        if (!nomeAcomp) {
+          camposVazios = true;
+        } else {
+          acompanhantes.push(nomeAcomp);
         }
       }
 
-      function confirmarPresenca() {
-        const nome = document.getElementById("nome").value.trim();
-        if (!nome) {
-          alert("Por favor, preencha seu nome.");
-          return;
-        }
-
-        const qtd = parseInt(document.getElementById("qtd").value);
-        let acompanhantes = [];
-        let camposVazios = false;
-
-        for (let i = 1; i <= qtd; i++) {
-          const campo = document.getElementById(`acomp${i}`);
-          const nomeAcomp = campo ? campo.value.trim() : "";
-          if (!nomeAcomp) {
-            camposVazios = true;
-          } else {
-            acompanhantes.push(nomeAcomp);
-          }
-        }
-
-        if (qtd > 0 && camposVazios) {
-          alert("Você selecionou acompanhantes. Por favor, preencha todos os nomes.");
-          return;
-        }
-
-        let mensagem = `🎉 *Confirmação de Presença* 🎉\n\n👤 *Convidado:* ${nome}`;
-
-        if (acompanhantes.length > 0) {
-          mensagem += `\n\n👥 *Acompanhante(s):*`;
-          acompanhantes.forEach((acomp) => {
-            mensagem += `\n- ${acomp}`;
-          });
-        }
-
-        mensagem +=
-          "\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖";
-
-        const numero = "556392255000"; // Altere aqui para seu número
-        const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
-
-        console.log("Link WhatsApp gerado:", url);
-
-        window.open(url, "_blank");
+      if (qtd > 0 && camposVazios) {
+        alert("Você selecionou acompanhantes. Por favor, preencha todos os nomes.");
+        return;
       }
-    </script>
-  </body>
+
+      let mensagem = `🎉 *Confirmação de Presença* 🎉\n\n👤 *Convidado:* ${nome}`;
+
+      if (acompanhantes.length > 0) {
+        mensagem += `\n\n👥 *Acompanhante(s):*`;
+        acompanhantes.forEach((acomp) => {
+          mensagem += `\n- ${acomp}`;
+        });
+      }
+
+      mensagem +=
+        "\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖";
+
+      const numero = "556392255000"; // Altere aqui para o seu número de WhatsApp
+      const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+
+      window.open(url, "_blank");
+    }
+  </script>
+</body>
 </html>
