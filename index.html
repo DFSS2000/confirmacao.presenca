@@ -47,6 +47,11 @@
       <option value="3">3</option>
       <option value="4">4</option>
       <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
     </select>
 
     <div id="camposAcompanhantes" class="acompanhantes"></div>
@@ -62,6 +67,7 @@
           const input = document.createElement('input');
           input.placeholder = `Nome do acompanhante ${i}`;
           input.id = `acomp${i}`;
+          input.required = true;
           container.appendChild(input);
         }
       }
@@ -72,14 +78,27 @@
           alert("Por favor, preencha seu nome.");
           return;
         }
+
         const qtd = parseInt(document.getElementById('qtd').value);
         let acompanhantes = [];
+        let camposVazios = false;
 
         for (let i = 1; i <= qtd; i++) {
-          const nomeAcomp = document.getElementById(`acomp${i}`).value.trim();
-          if (nomeAcomp) acompanhantes.push(nomeAcomp);
+          const campo = document.getElementById(`acomp${i}`);
+          const nomeAcomp = campo ? campo.value.trim() : '';
+          if (!nomeAcomp) {
+            camposVazios = true;
+          } else {
+            acompanhantes.push(nomeAcomp);
+          }
         }
 
+        if (qtd > 0 && camposVazios) {
+          alert("Você selecionou acompanhantes. Por favor, preencha todos os nomes.");
+          return;
+        }
+
+        // Enviar para o Cloudflare Worker (que chama o Apps Script)
         fetch("https://confirmacao.danielfelipe-engcivil.workers.dev/", {
           method: "POST",
           body: JSON.stringify({
@@ -90,17 +109,19 @@
           headers: { "Content-Type": "application/json" }
         }).then(response => response.json())
           .then(data => {
-            if(data.status === "success") {
-              let mensagem = `Olá! Sou ${nome} e confirmo minha presença no casamento.`;
+            if (data.status === "success") {
+              let mensagem = `✅ *Confirmação de Presença*\n\n👤 *Convidado:* ${nome}`;
               if (acompanhantes.length > 0) {
-                mensagem += `%0AEstou levando os seguintes acompanhantes:%0A`;
+                mensagem += `\n👥 *Acompanhantes:*\n`;
                 acompanhantes.forEach(acomp => {
-                  mensagem += `- ${acomp}%0A`;
+                  mensagem += `• ${acomp}\n`;
                 });
               }
-              mensagem += `%0ASerá uma alegria participar desse momento especial! 💍✨`;
-              const numero = "556392255000";
-              const url = `https://wa.me/${numero}?text=${mensagem}`;
+              mensagem += `\n💍 Mal posso esperar por esse momento especial com vocês! ✨`;
+
+              const textoCodificado = encodeURIComponent(mensagem);
+              const numero = "556392255000"; // Substitua pelo seu número
+              const url = `https://wa.me/${numero}?text=${textoCodificado}`;
               window.open(url, '_blank');
             } else {
               alert("Houve um erro ao confirmar presença. Tente novamente.");
