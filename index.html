@@ -143,17 +143,17 @@
           .then(data => {
             document.getElementById("overlay").style.display = "none";
             if (data.status === "success") {
-              let mensagem = `✨ Confirmação de Presença ✨%0A%0A🎉 Convidado: ${nome}`;
+              let mensagem = `✨ Confirmação de Presença ✨\n\n🎉 Convidado: ${nome}`;
               if (acompanhantes.length > 0) {
-                mensagem += `%0A👫 Acompanhante(s):%0A`;
+                mensagem += `\n👫 Acompanhante(s):\n`;
                 acompanhantes.forEach(acomp => {
-                  mensagem += `• ${acomp}%0A`;
+                  mensagem += `• ${acomp}\n`;
                 });
               }
-              mensagem += `%0A%0ACom muita alegria, confirmamos nossa presença nesse momento tão especial.%0AEstamos contando os dias para celebrar com vocês! 💖`;
+              mensagem += `\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖`;
 
               const numero = "556392255000";
-              const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+              const url = `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(mensagem)}`;
               window.open(url, '_blank');
             } else {
               alert("Houve um erro ao confirmar presença. Tente novamente.");
