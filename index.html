@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <base target="_top">
     <meta charset="UTF-8">
+    <title>Confirmação de Presença</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -33,7 +33,6 @@
         margin-top: 20px;
       }
       button:hover { background-color: #1ebe5b; }
-
       .overlay {
         display: none;
         position: fixed;
@@ -44,7 +43,6 @@
         justify-content: center;
         align-items: center;
       }
-
       .spinner {
         border: 6px solid #f3f3f3;
         border-top: 6px solid #25d366;
@@ -53,7 +51,6 @@
         height: 50px;
         animation: spin 1s linear infinite;
       }
-
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -131,7 +128,7 @@
 
         document.getElementById("overlay").style.display = "flex";
 
-        fetch("https://script.google.com/macros/s/AKfycbypsaGlNKbssl-F7yeMkzoCCtlW7mXR0OY69rdbu8cjW8Ubuj_Qhfj5HUfWM8EC4fA87w/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbyllBwcrebwqJe1-QySY6RtDOiEBdWhKY4RupSAjfh1qHYxHQeiKCwZn-ixXXbA3q9taQ/exec", {
           method: "POST",
           body: JSON.stringify({
             nomePrincipal: nome,
@@ -152,8 +149,8 @@
               }
               mensagem += `\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖`;
 
-              const numero = "556392255000";
-              const url = `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(mensagem)}`;
+              const numero = "556392255000"; // Seu número com DDI e DDD
+              const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
               window.open(url, '_blank');
             } else {
               alert("Houve um erro ao confirmar presença. Tente novamente.");
@@ -162,7 +159,7 @@
           }).catch((error) => {
             document.getElementById("overlay").style.display = "none";
             alert("Erro ao enviar confirmação. Tente novamente.");
-            console.error(error);
+            console.error("Erro:", error);
           });
       }
     </script>
