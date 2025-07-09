@@ -16,18 +16,21 @@
       box-sizing: border-box;
       color: #333;
     }
+
     h2 {
       text-align: center;
       margin-bottom: 25px;
       font-size: 1.8rem;
       font-weight: 700;
     }
+
     label {
       display: block;
       margin-top: 18px;
       font-size: 1.1rem;
       font-weight: 600;
     }
+
     input,
     select {
       width: 100%;
@@ -39,15 +42,14 @@
       box-sizing: border-box;
       transition: border-color 0.3s ease;
     }
+
     input:focus,
     select:focus {
       border-color: #25d366;
       outline: none;
       box-shadow: 0 0 5px #25d366a0;
     }
-    .acompanhantes {
-      margin-top: 15px;
-    }
+
     button {
       width: 100%;
       padding: 16px 0;
@@ -62,14 +64,33 @@
       transition: background-color 0.3s ease;
       user-select: none;
     }
+
     button:hover,
     button:focus {
       background-color: #1ebe5b;
     }
-    /* Para inputs de acompanhantes */
-    #camposAcompanhantes input {
-      margin-top: 12px;
+
+    /* Loader */
+    .loader {
+      display: none;
+      margin: 25px auto 10px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #25d366;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 0.8s linear infinite;
     }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
   </style>
 </head>
 <body>
@@ -79,7 +100,7 @@
   <input type="text" id="nome" placeholder="Ex: João da Silva" required />
 
   <label for="qtd">Quantos acompanhantes?</label>
-  <select id="qtd" onchange="gerarCampos()">
+  <select id="qtd">
     <option value="0">0</option>
     <option value="1">1</option>
     <option value="2">2</option>
@@ -93,66 +114,62 @@
     <option value="10">10</option>
   </select>
 
-  <div id="camposAcompanhantes" class="acompanhantes"></div>
-
   <button onclick="confirmarPresenca()">Confirmar Presença</button>
 
-  <script>
-    function gerarCampos() {
-      const qtd = document.getElementById("qtd").value;
-      const container = document.getElementById("camposAcompanhantes");
-      container.innerHTML = "";
-      for (let i = 1; i <= qtd; i++) {
-        const input = document.createElement("input");
-        input.placeholder = `Nome do acompanhante ${i}`;
-        input.id = `acomp${i}`;
-        input.required = true;
-        container.appendChild(input);
-      }
-    }
+  <div id="loader" class="loader"></div>
 
-    function confirmarPresenca() {
+  <script>
+    async function confirmarPresenca() {
       const nome = document.getElementById("nome").value.trim();
+      const qtd = parseInt(document.getElementById("qtd").value);
+      const total = qtd + 1;
+      const data = new Date().toLocaleString("pt-BR");
+      const loader = document.getElementById("loader");
+
       if (!nome) {
         alert("Por favor, preencha seu nome.");
         return;
       }
 
-      const qtd = parseInt(document.getElementById("qtd").value);
-      let acompanhantes = [];
-      let camposVazios = false;
+      const dados = {
+        nomePrincipal: nome,
+        quantidade: qtd,
+        dataConfirmacao: data,
+        total: total
+      };
 
-      for (let i = 1; i <= qtd; i++) {
-        const campo = document.getElementById(`acomp${i}`);
-        const nomeAcomp = campo ? campo.value.trim() : "";
-        if (!nomeAcomp) {
-          camposVazios = true;
-        } else {
-          acompanhantes.push(nomeAcomp);
-        }
-      }
+      loader.style.display = "block"; // Mostrar carregando
 
-      if (qtd > 0 && camposVazios) {
-        alert("Você selecionou acompanhantes. Por favor, preencha todos os nomes.");
-        return;
-      }
-
-      let mensagem = `🎉 *Confirmação de Presença* 🎉\n\n👤 *Convidado:* ${nome}`;
-
-      if (acompanhantes.length > 0) {
-        mensagem += `\n\n👥 *Acompanhante(s):*`;
-        acompanhantes.forEach((acomp) => {
-          mensagem += `\n- ${acomp}`;
+      try {
+        const resposta = await fetch("https://confirmacao.danielfelipe-engcivil.workers.dev/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dados)
         });
+
+        loader.style.display = "none"; // Ocultar carregando
+
+        if (resposta.ok) {
+          alert("Confirmação registrada com sucesso!");
+
+          let mensagem = `🎉 *Confirmação de Presença* 🎉\n\n👤 *Convidado:* ${nome}`;
+          if (qtd > 0) {
+            mensagem += `\n👥 *Acompanhantes:* ${qtd}`;
+          }
+          mensagem += `\n\nTotal de pessoas: ${total}`;
+          mensagem += "\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖";
+
+          const numero = "556392255000"; // Altere aqui
+          const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+          window.open(url, "_blank");
+        } else {
+          alert("Erro ao registrar confirmação. Tente novamente.");
+        }
+      } catch (e) {
+        loader.style.display = "none";
+        alert("Erro de conexão com o servidor.");
+        console.error(e);
       }
-
-      mensagem +=
-        "\n\nCom muita alegria, confirmamos nossa presença nesse momento tão especial.\nEstamos contando os dias para celebrar com vocês! 💖";
-
-      const numero = "556392255000"; // Altere aqui para o seu número de WhatsApp
-      const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
-
-      window.open(url, "_blank");
     }
   </script>
 </body>
