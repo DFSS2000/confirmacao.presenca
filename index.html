@@ -2,6 +2,7 @@
 <html>
   <head>
     <base target="_top">
+    <meta charset="UTF-8">
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -11,6 +12,7 @@
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        position: relative;
       }
       h2 { text-align: center; color: #333; }
       label { display: block; margin-top: 15px; }
@@ -31,6 +33,32 @@
         margin-top: 20px;
       }
       button:hover { background-color: #1ebe5b; }
+
+      /* Tela de carregamento */
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.4);
+        z-index: 999;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .spinner {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #25d366;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
     </style>
   </head>
   <body>
@@ -57,6 +85,11 @@
     <div id="camposAcompanhantes" class="acompanhantes"></div>
 
     <button onclick="confirmarPresenca()">Confirmar Presença</button>
+
+    <!-- Tela de carregamento -->
+    <div class="overlay" id="overlay">
+      <div class="spinner"></div>
+    </div>
 
     <script>
       function gerarCampos() {
@@ -98,7 +131,9 @@
           return;
         }
 
-        // Enviar para o Cloudflare Worker (que chama o Apps Script)
+        // Mostra o carregando
+        document.getElementById("overlay").style.display = "flex";
+
         fetch("https://confirmacao.danielfelipe-engcivil.workers.dev/", {
           method: "POST",
           body: JSON.stringify({
@@ -109,25 +144,26 @@
           headers: { "Content-Type": "application/json" }
         }).then(response => response.json())
           .then(data => {
+            document.getElementById("overlay").style.display = "none"; // esconde o loading
             if (data.status === "success") {
-              let mensagem = `✅ *Confirmação de Presença*\n\n👤 *Convidado:* ${nome}`;
+              let mensagem = `✅ *Confirmação de Presença*%0A%0A👤 *Convidado:* ${nome}`;
               if (acompanhantes.length > 0) {
-                mensagem += `\n👥 *Acompanhantes:*\n`;
+                mensagem += `%0A👥 *Acompanhantes:*%0A`;
                 acompanhantes.forEach(acomp => {
-                  mensagem += `• ${acomp}\n`;
+                  mensagem += `• ${acomp}%0A`;
                 });
               }
-              mensagem += `\n💍 Mal posso esperar por esse momento especial com vocês! ✨`;
+              mensagem += `%0A💒 Mal posso esperar por esse momento especial com vocês! ✨`;
 
-              const textoCodificado = encodeURIComponent(mensagem);
-              const numero = "556392255000"; // Substitua pelo seu número
-              const url = `https://wa.me/${numero}?text=${textoCodificado}`;
+              const numero = "556392255000";
+              const url = `https://wa.me/${numero}?text=${mensagem}`;
               window.open(url, '_blank');
             } else {
               alert("Houve um erro ao confirmar presença. Tente novamente.");
               console.error(data.message);
             }
           }).catch((error) => {
+            document.getElementById("overlay").style.display = "none";
             alert("Erro ao enviar confirmação. Tente novamente.");
             console.error(error);
           });
